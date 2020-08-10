@@ -1,6 +1,7 @@
 # Dash Microbiome
 
-![](dash_metabolomics.gif)
+![](dash_microbiome.gif)
+![](dash_microbiome.png)
 
 This is a repo to demonstrate how to build a Dash app in R for microbiome data. It is under development and therefore not yet deployed on a server. This app in particular makes use of common packages for microbiome analysis including `phyloseq`, `microbiome`, `picante`.
 
