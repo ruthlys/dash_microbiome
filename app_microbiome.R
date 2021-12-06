@@ -65,66 +65,9 @@ psbac2.rel = filter_taxa(psbac2.rel, function(x) mean(x) > 0.001, TRUE)
 # calculate percentage 
 psbac2.rel = transform_sample_counts(psbac2.rel, function(x) 100 * x/sum(x))
 
-# # calculate alpha diversity
-# alphabac = estimate_richness(psbac1, measures=c("Shannon", "InvSimpson"))
-# # get the metadata out as separate object
-# alphabac.meta = meta(psbac1)
-# # add the rownames as a new colum for integration later
-# alphabac.meta$sam_name = rownames(alphabac.meta)
-# # add the rownames to diversity table
-# alphabac$sam_name = rownames(alphabac)
-# # merge these two data frames into one
-# alphabac.df = merge(alphabac.meta, alphabac, by = "sam_name")
-# # calculate diversity (Faith's PD)
-# psbac1.div = as.data.frame(psbac1@otu_table)
-# psbac1.tree = psbac1@phy_tree
-# # calculate PD and SR using picante
-# psbac1.div = pd(t(psbac1.div), psbac1.tree, include.root=F) # t(otu_table) transposes the table for use in picante
-# psbac1.div = setDT(psbac1.div, keep.rownames = "sam_name")
-# # add results of PD to div.df file
-# alphabac.df$Phylogenetic_Diversity = psbac1.div$PD
-# colnames(alphabac.df) = c("sam_name", "SoilType", "Date", "Treatment", "Shannon", "InvSimpson", "Phylogenetic Diversity")
-# alphabac.df = reshape2::melt(alphabac.df)
-# 
-# # continue processing data and bar charts of top 10 phyla and genera
-# # remove singletons
-# psbac1a = prune_taxa(taxa_sums(psbac1) > 1, psbac1)
-# psbac2 = subset_taxa(psbac1a, Phylum !="Unclassified") %>% subset_taxa(Genus !="Unclassified")
-# # transform abundance counts to fractional abundance
-# psbac2.rel = transform_sample_counts(psbac2, function(x) x /sum(x))
-# # filter mean abundance above 1% mean rel abundance (loss of low abundance AOB!)
-# psbac2.rel = filter_taxa(psbac2.rel, function(x) mean(x) > 0.001, TRUE)
-# # calculate percentage
-# psbac2.rel = transform_sample_counts(psbac2.rel, function(x) 100 * x/sum(x))
-# # convert to df
-# psbac.df = psmelt(psbac2.rel)
-# 
-# # agglomerate taxa at phylum level and extract top 10 phyla for 16S
-# bacglomp = tax_glom(psbac2.rel, taxrank = "Phylum")
-# bactop10p = sort(tapply(taxa_sums(bacglomp), tax_table(bacglomp)[, "Phylum"], sum), decreasing = TRUE)[1:10]
-# bactop10p = subset_taxa(bacglomp, Phylum %in% names(bactop10p))
-# # agglomerate taxa at genus level and extract top 10 genera for 16S
-# bacglomg = tax_glom(psbac2.rel, taxrank = "Genus")
-# bactop10g = sort(tapply(taxa_sums(bacglomg), tax_table(bacglomg)[, "Genus"], sum), decreasing = TRUE)[1:10]
-# bactop10g = subset_taxa(bacglomg, Genus %in% names(bactop10g))
-# 
-# # create dataframe from phyloseq object
-# create_dataframe <- function(dataframe){
-#   data.table(psmelt(dataframe))
-# }
-# 
-# top10p.df <- create_dataframe(bactop10p)
-# top10g.df <- create_dataframe(bactop10g)
-# 
-# # alternatively save and read in files
-# fwrite(alphabac.df, file="/Users/ruthschmidt/Dropbox/Work/Plotly/test_files/alphabac.csv", row.names = FALSE)
-# fwrite(psbac.df, file="/Users/ruthschmidt/Dropbox/Work/Plotly/test_files/psbac_melt.csv", row.names = FALSE)
-# fwrite(top10p.df, file="/Users/ruthschmidt/Dropbox/Work/Plotly/test_files/bactop10p.csv", row.names = FALSE)
-# fwrite(top10g.df, file="/Users/ruthschmidt/Dropbox/Work/Plotly/test_files/bactop10g.csv", row.names = FALSE)
-
 ####################################################################################################
 
-#################################### APP START $ LOAD FILES ########################################
+#################################### APP START & LOAD FILES ########################################
 
 app <- Dash$new()
 # Initiate application
@@ -177,40 +120,6 @@ createStackedbar <- function(stackedbar_file){
     yaxis = list(title = "Relative abundance"), # ticksuffix = "%"
     barmode = "stack")
 }
-
-# # create plot of top10 phyla and genera 
-# createBoxtop10p <- function(top10p_file, yaxis_type){
-#   # sort in desc order of mean abundance 
-#   top10p_file %>% mutate(Phylum=fct_reorder(Phylum, Abundance, .fun='mean', .desc=TRUE)) %>% 
-#   # create graph parameters 
-#   plot_ly(
-#     x = ~Phylum, y = ~Abundance,
-#     color = ~Treatment, colors = "Dark2",
-#     type = "box", alpha = 0.7) %>% 
-#     layout(
-#       boxmode = "group", 
-#       title = "Top 10 Phyla in decreasing order of mean abundance", 
-#       xaxis = list(title = 'Phylum'),
-#       yaxis = list(title = 'Relative abundance', type = yaxis_type))
-# }
-
-# # create 3d pca plot 
-# create3dScatter <- function(pca_file){
-#   plot_ly(
-#     pca_file, 
-#     x = ~x, 
-#     y = ~y, 
-#     z = ~z, 
-#     color = ~Treatment, 
-#     colors = "Dark2", 
-#     mode = "markers", 
-#     type = "scatter3d") %>% 
-#     layout(
-#       title = "Principal Coordinates Analysis (PCoA) of Volatile Organic Compounds (VOCs)",
-#       scene = list(xaxis = list(title = 'PC1 (37.1%)'),
-#                    yaxis = list(title = 'PC2 (13.3%)'),
-#                    zaxis = list(title = 'PC3 (5.7%)')))
-# }
 
 # create PCoA plot 
 m2 <- list(
